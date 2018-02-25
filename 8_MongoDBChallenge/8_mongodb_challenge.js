@@ -32,6 +32,18 @@ var WordAnalyzer = {
 		return wordCount;
 	},
 
+	createCollectionLast24HrsWords: function(){
+                var currentDate = new Date();
+                var last24Hrs =  new Date((new Date().setDate(currentDate.getDate()-1)));
+                db.wordstorage.aggregate([ {$match: {date: {$gte: last24Hrs, $lt:currentDate}}}, {$out: "last24hrs_words"}]);
+	},
+
+	createCollectionPrev24HrsPeriodWords: function(){
+	        var currentDate = new Date();
+                var last24Hrs =  new Date((new Date().setDate(currentDate.getDate()-1)));
+                var prev24Hrs = new Date((new Date().setDate(last24Hrs.getDate()-1)));
+		db.wordstorage.aggregate([ {$match: {date: {$gte: prev24Hrs, $lt:last24Hrs}}}, {$out: "prev24hrs_words"}]);
+	},
 
 	getFrequentWordOverall: function() {
 		db.wordstorage.mapReduce(this.map, this.reduce, {out: "overall_word_count"});
@@ -44,10 +56,7 @@ var WordAnalyzer = {
 	},
 
 	getFrequentWordLast24Hrs: function() {
-		var currentDate = new Date();
-		var last24Hrs =  new Date((new Date().setDate(currentDate.getDate()-1)));
-		//print("Current Date: " + currentDate + " Last24Hrs: " + new Date((new Date().setDate(currentDate.getDate()-1))));
-		db.wordstorage.aggregate([ {$match: {date: {$gte: last24Hrs, $lt:currentDate}}}, {$out: "last24hrs_words"}]);
+		this.createCollectionLast24HrsWords();
 		db.last24hrs_words.mapReduce(this.map, this.reduce, {out: "last24hrs_word_count"});
 		var cursor = db.last24hrs_word_count.find().sort({value:-1}).limit(1);
 		if(cursor.hasNext()){
@@ -55,6 +64,35 @@ var WordAnalyzer = {
 			print("The most frequent word in the last 24 hours is " + mostFrequentLast24Hrs._id + " appearing " + mostFrequentLast24Hrs.value + ((mostFrequentLast24Hrs.value != 1) ? " times." : "time."));
 		}	
 		
+	},
+
+	getTrendingWordPast24Hrs: function() {
+		this.createCollectionLast24HrsWords();
+		this.createCollectionPrev24HrsPeriodWords();
+
+		db.last24hrs_words.mapReduce(this.map, this.reduce, {out: "last24hrs_word_count"});
+		db.prev24hrs_words.mapReduce(this.map, this.reduce, {out: "prev24hrs_word_count"});
+
+		var trendingWord = {word: null, freqChange: null};
+		var prev24Word = null;
+		var tmpFreqChange = 0;
+
+		db.last24hrs_word_count.find().forEach(function(last24Word){
+			if(trendingWord.word === null){
+				trendingWord.word = last24Word._id;
+				trendingWord.freqChange =  last24Word.value;
+			}
+			
+			prev24Word =  db.prev24hrs_word_count.findOne( {_id: last24Word._id});
+			tmpFreqChange = (prev24Word) ? (last24Word.value - prev24Word.value) : last24Word.value;
+
+			if(tmpFreqChange > trendingWord.freqChange){
+				trendingWord.word = last24Word._id;
+				trendingWord.freqChange = tmpFreqChange; 
+			}
+
+		});
+		print("The trending word in the last 24 hrs is " + trendingWord.word + " with " + trendingWord.freqChange + " more occurrences compared to the previous 24 hour period.");
 	}
 	
 
@@ -63,7 +101,7 @@ var WordAnalyzer = {
 
 WordAnalyzer.getFrequentWordOverall();
 WordAnalyzer.getFrequentWordLast24Hrs();
-
+WordAnalyzer.getTrendingWordPast24Hrs();
 
 
 
