@@ -1,7 +1,7 @@
-//Query the database: trends, collection: wordstore
-//Run using mongo localhost:27012/trends 8_mongodb_challenge.js
+//Querying the database: trends, collection: wordstore
+//Executed and tested using mongo localhost:27012/trends 8_mongodb_challenge.js
 
-var WordsMapReduce = {
+var WordAnalyzer = {
 
 	getAllDocuments: function() {
 		var cursor = db.wordstorage.find();
@@ -9,7 +9,6 @@ var WordsMapReduce = {
 			printjson(cursor.next());
 		}
 	},
-
 
 	map: function() {
 		var wordsdata = this.words; //Array
@@ -42,12 +41,28 @@ var WordsMapReduce = {
 			var mostFrequentOverall = cursor.next();
 			print("The most frequent word in the entire dataset is " + mostFrequentOverall._id + " appearing " + mostFrequentOverall.value + ((mostFrequentOverall.value != 1) ? " times." : "time."));
 		}
+	},
+
+	getFrequentWordLast24Hrs: function() {
+		var currentDate = new Date();
+		var last24Hrs =  new Date((new Date().setDate(currentDate.getDate()-1)));
+		//print("Current Date: " + currentDate + " Last24Hrs: " + new Date((new Date().setDate(currentDate.getDate()-1))));
+		db.wordstorage.aggregate([ {$match: {date: {$gte: last24Hrs, $lt:currentDate}}}, {$out: "last24hrs_words"}]);
+		db.last24hrs_words.mapReduce(this.map, this.reduce, {out: "last24hrs_word_count"});
+		var cursor = db.last24hrs_word_count.find().sort({value:-1}).limit(1);
+		if(cursor.hasNext()){
+			var mostFrequentLast24Hrs = cursor.next();
+			print("The most frequent word in the last 24 hours is " + mostFrequentLast24Hrs._id + " appearing " + mostFrequentLast24Hrs.value + ((mostFrequentLast24Hrs.value != 1) ? " times." : "time."));
+		}	
+		
 	}
+	
 
 };
 
 
-WordsMapReduce.getFrequentWordOverall();
+WordAnalyzer.getFrequentWordOverall();
+WordAnalyzer.getFrequentWordLast24Hrs();
 
 
 
