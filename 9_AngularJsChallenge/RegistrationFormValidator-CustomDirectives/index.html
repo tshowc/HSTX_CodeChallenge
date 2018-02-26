@@ -39,7 +39,7 @@
             <button type="submit">Register</button> 
         </form>
     </div>
-    <div ng-show="form.registered" class="col-md-3">
+    <div data-ng-show="form.registered" class="col-md-3">
         <h1> Thank you for registering {{form.user.firstName}} {{form.user.lastName}}! :) </h1>
         <button ng-click="form.reset()" type="button">Reset Form</button>
    </div>
