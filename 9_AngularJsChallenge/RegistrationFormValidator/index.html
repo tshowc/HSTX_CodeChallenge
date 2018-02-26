@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>
+<html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>
+<html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>
+<html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html ng-app="SimpleFormApp" class="no-js"> <!--<![endif]-->
+<head>
+    <title>Registration Form</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.css"/>
+    <script src="js/angular.min.js"></script>
+    <script src="js/angular-route.min.js"></script>
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="main.ctrl.js"></script>
+</head>
+<body ng-controller="formCtrl as form">
+    <div ng-hide="form.registered" class="col-md-3">
+        <h1> Registration Form </h1>
+        <form name="registration" ng-submit="form.submit()" >
+            <span>First Name: </span>
+            <input type="text"  ng-model="form.user.firstName" placeholder="Ex. John" class="form-control"/>
+            <span>Last Name: </span>
+            <input type="text"  ng-model="form.user.lastName" placeholder="Ex. Doe" class="form-control"/>
+            <span>Email: </span>
+            <input type="email" ng-model="form.user.email" placeholder="Ex. sample@mail.com" class="form-control" required/>
+            <span>Password: </span>
+            <input type="password" ng-model="form.user.password" placeholder="password" class="form-control" required/>
+            <span>Phone Number: </span>
+            <input type="text" ng-model="form.user.phoneNum" placeholder="Ex. (123)456-7890, 123-456-7890, 1234567890" class="form-control" pattern='^[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4}$'/>
+            <br />
+            <button type="submit">Register</button> 
+        </form>
+    </div>
+    <div ng-show="form.registered" class="col-md-3">
+        <h1> Thank you for registering {{form.user.firstName}} {{form.user.lastName}}! :) </h1>
+        <button ng-click="form.reset()" type="button">Reset Form</button>
+   </div>
+</body>
+</html>

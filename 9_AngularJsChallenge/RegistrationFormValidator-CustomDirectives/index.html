@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>
+<html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>
+<html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>
+<html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html data-ng-app="SimpleFormApp" class="no-js"> <!--<![endif]-->
+<head>
+    <title>Registration Form</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.css"/>
+    <script src="js/angular.min.js"></script>
+    <script src="js/angular-route.min.js"></script>
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="main.ctrl.js"></script>
+</head>
+<body data-ng-controller="formCtrl as form">
+    <div data-ng-hide="form.registered" class="col-md-3">
+        <h1> Registration Form </h1>
+        <form name="registrationForm" data-ng-submit="form.submit()" novalidate>
+            <span>First Name: </span>
+            <input type="text"  data-ng-model="form.user.firstName" placeholder="Ex. John" class="form-control"/>
+            <span>Last Name: </span>
+            <input type="text"  data-ng-model="form.user.lastName" placeholder="Ex. Doe" class="form-control"/>
+            <span>Email: </span>
+            <input type="email" name="userEmail" data-ng-model="form.user.email" placeholder="Ex. sample@mail.com" class="form-control" email-validator required/>
+            <p data-ng-show="form.errors && registrationForm.userEmail.$error.required">Email is required.</p>
+            <p data-ng-show="form.errors && registrationForm.userEmail.$error.emailValidity">Email is in incorrect format.</p>
+            <span>Password: </span>
+            <input type="password" name="password" data-ng-model="form.user.password" placeholder="password" class="form-control" required/>
+            <p data-ng-show="form.errors && registrationForm.password.$error.required">Password is required.</p>
+            <span>Phone Number: </span>
+            <input type="text" name="phoneNum" data-ng-model="form.user.phoneNum" placeholder="Ex. (123)456-7890, 123-456-7890, 1234567890" class="form-control" phone-number-validator/>
+            <p data-ng-show="form.errors && registrationForm.phoneNum.$error.phoneNumberValidity">Phone number is in incorrect format. Note: Only US numbers are supported.</p>
+            <br />
+            <button type="submit">Register</button> 
+        </form>
+    </div>
+    <div ng-show="form.registered" class="col-md-3">
+        <h1> Thank you for registering {{form.user.firstName}} {{form.user.lastName}}! :) </h1>
+        <button ng-click="form.reset()" type="button">Reset Form</button>
+   </div>
+</body>
+</html>
