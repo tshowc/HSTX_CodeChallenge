@@ -1,0 +1,50 @@
+<style>
+    .container {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        margin: auto;
+        width: 50%;
+    }
+    
+    #results .row {
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+</style>
+<div class="container">
+        <h1 style="text-align:center;">Search Tweets by Username</h1>
+        <div class="row">
+            <div class=" col-xs-offset-2 col-xs-6">
+               <input type="text" ng-model="vm.userName" class="form-control" id="searchBox" placeholder="Enter Username Here" style="display:none;"/>
+            </div>
+            <div class="col-xs-4">            
+                <button ng-click="vm.refreshTimeline()" id="searchButton" type="button" class="btn btn-default" style="display:none;">Search</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-offset-4 col-xs-4 col-xs-offset-4">
+                <button ng-click="vm.connectButton()" id="connectButton" type="button" class="btn btn-primary">Connect Twitter</button>
+                <button ng-click="vm.refreshTimeline()" id="getTimelineButton" type="button" class="btn btn-info" style="display:none;">Refresh Tweets</button>
+                <button ng-click="vm.signOut()" id="signOut" type="button" class="btn btn-link" style="display:none;">Sign Out</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12" id="results">
+                <div class="row" ng-repeat="t in vm.tweets">
+
+                    <div class="col-xs-2 col-sm-1">
+                        <img ng-src="{{t.user.profile_image_url}}" class="img-circle">
+                    </div>
+                    <div class="col-xs-10 col-sm-11">
+                        <small>{{t.user.name}} on {{t.created_at}} <!--with {{t.enWordCount}} English words.--></small>
+                        <br> <span ng-bind-html="t.text"></span>
+                    </div>
+
+                </div>
+
+                <div ng-show="vm.rateLimitError">
+                    Rate limit reached. You are making too many requests.
+                </div>
+            </div>
+        </div>
+    </div>
